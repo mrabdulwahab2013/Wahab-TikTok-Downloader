@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunter Tech - TikTok Video Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --pink: #ff2d55;
+            --purple: #af52de;
+            --blue: #5e5ce6;
+            --cyan: #64d2ff;
+            --bg: #000000;
+            --card: #1c1c1e;
+            --card-light: #2c2c2e;
+            --text: #ffffff;
+            --text-secondary: #8e8e93;
+            --border: #38383a;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --gradient-1: linear-gradient(135deg, #ff2d55, #ff375f);
+            --gradient-2: linear-gradient(135deg, #5e5ce6, #7d7aff);
+            --gradient-3: linear-gradient(135deg, #ff2d55, #af52de);
+            --gradient-4: linear-gradient(135deg, #64d2ff, #5e5ce6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* ===== SPLASH SCREEN ===== */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .splash-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+
+        .splash-logo {
+            width: 90px;
+            height: 90px;
+            background: var(--gradient-3);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            animation: splashPulse 1.5s infinite ease-in-out;
+            box-shadow: 0 20px 60px rgba(255, 45, 85, 0.4);
+            margin-bottom: 20px;
+        }
+
+        @keyframes splashPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(255, 45, 85, 0.4); }
+            50% { transform: scale(1.08); box-shadow: 0 30px 80px rgba(255, 45, 85, 0.6); }
+        }
+
+        .splash-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 1px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .splash-title span {
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .splash-loader {
+            margin-top: 30px;
+            width: 50px;
+            height: 4px;
+            background: #2c2c2e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .splash-loader-bar {
+            height: 100%;
+            background: var(--gradient-3);
+            border-radius: 10px;
+            width: 0%;
+            animation: loadingBar 1.8s ease-in-out forwards;
+        }
+
+        @keyframes loadingBar {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+            min-height: 100vh;
+            background: var(--bg);
+            position: relative;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .app-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 8px;
+            font-size: 0.75em;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 0.85em;
+        }
+
+        /* Header */
+        .app-header {
+            padding: 10px 20px 5px;
+            text-align: center;
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            background: var(--gradient-3);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 45, 85, 0.3);
+        }
+
+        .brand-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-name .highlight {
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ===== PAGES CONTAINER ===== */
+        .pages-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== HOME PAGE ===== */
+        .page {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 16px 20px;
+            animation: fadeInPage 0.4s ease;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Card */
+        .hero-card {
+            margin: 5px 0;
+            padding: 25px 20px;
+            background: var(--gradient-3);
+            border-radius: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(255, 45, 85, 0.25);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .hero-icon {
+            font-size: 50px;
+            margin-bottom: 8px;
+            animation: bounceIcon 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtext {
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.8);
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Input Card */
+        .input-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 6px;
+            border: 1.5px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .input-card:focus-within {
+            border-color: #ff2d55;
+            box-shadow: 0 0 0 4px rgba(255, 45, 85, 0.08);
+        }
+
+        .input-inner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-icon-circle {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            background: var(--card-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .input-card input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 4px;
+            font-size: 0.9em;
+            color: var(--text);
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            min-width: 0;
+        }
+
+        .input-card input::placeholder {
+            color: #555;
+        }
+
+        .clear-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .clear-btn:hover {
+            color: #ff2d55;
+            background: rgba(255,45,85,0.1);
+        }
+
+        .paste-chip {
+            background: var(--card-light);
+            border: none;
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.78em;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .paste-chip:hover {
+            background: #3a3a3c;
+        }
+
+        .paste-chip i {
+            font-size: 12px;
+        }
+
+        /* Fetch Button */
+        .fetch-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(255, 45, 85, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fetch-btn:active {
+            transform: scale(0.97);
+        }
+
+        .fetch-btn:disabled {
+            opacity: 0.5;
+            transform: none;
+        }
+
+        .btn-shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .fetch-btn:hover .btn-shine {
+            left: 100%;
+        }
+
+        /* Loading Skeleton */
+        .loading-skeleton {
+            display: none;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .skeleton-video {
+            width: 100%;
+            aspect-ratio: 9/16;
+            max-height: 350px;
+            background: var(--card-light);
+            border-radius: 14px;
+            animation: shimmer 1.5s infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+
+        .skeleton-text {
+            height: 14px;
+            background: var(--card-light);
+            border-radius: 7px;
+            width: 60%;
+            margin: 0 auto;
+            animation: shimmer 1.5s infinite;
+            animation-delay: 0.3s;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff2d55;
+            animation: dotBounce 1.2s infinite;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loading-label {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        /* Result Section */
+        .result-section {
+            display: none;
+            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-card {
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+
+        .video-card video {
+            width: 100%;
+            display: block;
+            max-height: 480px;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 17px;
+            background: var(--gradient-4);
+            color: #000;
+            border: none;
+            border-radius: 16px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(100, 210, 255, 0.25);
+        }
+
+        .download-btn:active {
+            transform: scale(0.97);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+
+        /* Error Card */
+        .error-card {
+            display: none;
+            background: rgba(255, 45, 85, 0.08);
+            border: 1px solid rgba(255, 45, 85, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            color: #ff6b8a;
+            font-size: 0.85em;
+            font-weight: 500;
+            animation: shake 0.5s ease;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* ===== DOWNLOADS PAGE ===== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 30px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .empty-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .empty-subtitle {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+
+        .downloads-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .download-item {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .download-item:active {
+            background: var(--card-light);
+        }
+
+        .download-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--card-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .download-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .download-name {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .download-date {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+        }
+
+        .download-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .download-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-play {
+            background: rgba(100,210,255,0.15);
+            color: var(--cyan);
+        }
+
+        .btn-delete {
+            background: rgba(255,45,85,0.15);
+            color: #ff6b8a;
+        }
+
+        /* ===== SETTINGS PAGE ===== */
+        .settings-group {
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .settings-group-title {
+            padding: 14px 18px 8px;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item:active {
+            background: var(--card-light);
+        }
+
+        .setting-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .setting-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .setting-icon.pink { background: rgba(255,45,85,0.15); color: #ff2d55; }
+        .setting-icon.blue { background: rgba(94,92,230,0.15); color: #5e5ce6; }
+        .setting-icon.cyan { background: rgba(100,210,255,0.15); color: #64d2ff; }
+        .setting-icon.orange { background: rgba(255,159,10,0.15); color: #ff9f0a; }
+        .setting-icon.green { background: rgba(48,209,88,0.15); color: #30d158; }
+
+        .setting-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .setting-label {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .setting-desc {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a3a3c;
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #ff2d55;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .setting-value {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .setting-value i {
+            font-size: 10px;
+        }
+
+        /* ===== ABOUT PAGE ===== */
+        .about-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .about-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-3);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            margin: 0 auto 16px;
+            box-shadow: 0 15px 40px rgba(255, 45, 85, 0.3);
+        }
+
+        .about-app-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .about-version {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .about-creator {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .creator-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            overflow: hidden;
+            border: 3px solid var(--border);
+            box-shadow: 0 8px 25px rgba(255, 45, 85, 0.2);
+        }
+
+        .creator-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .creator-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .creator-role {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .social-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .social-link {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .social-link:active {
+            transform: scale(0.95);
+            background: var(--card-light);
+        }
+
+        .social-link i {
+            font-size: 28px;
+        }
+
+        .social-link .fa-whatsapp { color: #25D366; }
+        .social-link .fa-youtube { color: #FF0000; }
+        .social-link .fa-telegram { color: #0088cc; }
+        .social-link .fa-tiktok { color: #ff2d55; }
+
+        .social-label {
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .social-username {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 16px 20px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            font-size: 0.65em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            padding: 6px 14px;
+            border-radius: 12px;
+        }
+
+        .nav-item i {
+            font-size: 1.5em;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #ff2d55;
+        }
+
+        .nav-item.active i {
+            text-shadow: 0 0 20px rgba(255, 45, 85, 0.5);
+        }
+
+        .nav-item:active {
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85em;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success i { color: #30d158; }
+        .toast.error i { color: #ff2d55; }
+        .toast.info i { color: #64d2ff; }
+
+        /* Responsive */
+        @media (max-width: 460px) {
+            .app-container {
+                border-radius: 0;
+                max-width: 100%;
+            }
+        }
+
+        @media (min-width: 461px) {
+            .app-container {
+                min-height: auto;
+                max-height: 95vh;
+                border-radius: 30px;
+                margin: 10px;
+                box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+                border: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">
+            <i class="fa-brands fa-tiktok"></i>
+        </div>
+        <div class="splash-title">
+            Hunter Tech<br><span>TikTok Video Downloader</span>
+        </div>
+        <div class="splash-loader">
+            <div class="splash-loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div class="app-container" id="appContainer">
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span id="statusTime">9:41 AM</span>
+            <span class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </span>
+        </div>
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="brand-row">
+                <div class="brand-logo">
+                    <i class="fa-brands fa-tiktok"></i>
+                </div>
+                <div class="brand-name">
+                    Hunter <span class="highlight">Tech</span>
+                </div>
+            </div>
+            <div class="header-subtitle">TikTok Video Downloader</div>
+        </div>
+
+        <!-- Pages Container -->
+        <div class="pages-container">
+            
+            <!-- HOME PAGE -->
+            <div class="page active" id="homePage">
+                <div class="hero-card">
+                    <div class="hero-icon"><i class="fa-solid fa-film"></i></div>
+                    <div class="hero-text">Download Without Watermark</div>
+                    <div class="hero-subtext">Fast &bull; HD Quality &bull; Free</div>
+                </div>
+
+                <div class="input-card">
+                    <div class="input-inner">
+                        <div class="input-icon-circle">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="videoUrl" 
+                            placeholder="Paste TikTok link..."
+                            autocomplete="off"
+                        />
+                        <button class="clear-btn" id="clearBtn" onclick="clearInput()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <button class="paste-chip" onclick="pasteFromClipboard()">
+                            <i class="fa-solid fa-paste"></i> Paste
+                        </button>
+                    </div>
+                </div>
+
+                <button class="fetch-btn" id="fetchBtn" onclick="fetchVideo()">
+                    <span id="fetchBtnText"><i class="fa-solid fa-cloud-arrow-down"></i> Fetch Video</span>
+                    <div class="btn-shine"></div>
+                </button>
+
+                <div class="loading-skeleton" id="loadingSkeleton">
+                    <div class="skeleton-video"></div>
+                    <div class="loading-dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <p class="loading-label">Fetching your video...</p>
+                </div>
+
+                <div class="error-card" id="errorCard">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="errorText">Something went wrong</span>
+                </div>
+
+                <div class="result-section" id="resultSection">
+                    <div class="video-card">
+                        <span class="video-badge">HD Ready</span>
+                        <video id="videoPreview" controls playsinline></video>
+                    </div>
+                    <button class="download-btn" id="downloadBtn" onclick="downloadVideo()">
+                        <i class="fa-solid fa-download"></i> Download Video
+                    </button>
+                </div>
+            </div>
+
+            <!-- DOWNLOADS PAGE -->
+            <div class="page" id="downloadsPage">
+                <div class="empty-state" id="emptyDownloads">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div class="empty-title">No Downloads Yet</div>
+                    <div class="empty-subtitle">Downloaded videos will appear here</div>
+                </div>
+                <div class="downloads-list" id="downloadsList" style="display:none;"></div>
+            </div>
+
+            <!-- SETTINGS PAGE -->
+            <div class="page" id="settingsPage">
+                <div class="settings-group">
+                    <div class="settings-group-title">Download Settings</div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon cyan">
+                                <i class="fa-solid fa-film"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">Download Quality</span>
+                                <span class="setting-desc">Select video quality</span>
+                            </div>
+                        </div>
+                        <div class="setting-value" onclick="cycleQuality()" id="qualityValue">
+                            HD <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon orange">
+                                <i class="fa-solid fa-water"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">Remove Watermark</span>
+                                <span class="setting-desc">Download without watermark</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="watermarkToggle" checked onchange="toggleSetting('watermark')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon green">
+                                <i class="fa-solid fa-compact-disc"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">Auto-Save to Gallery</span>
+                                <span class="setting-desc">Save directly after download</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoSaveToggle" onchange="toggleSetting('autoSave')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group" style="margin-top: 16px;">
+                    <div class="settings-group-title">App Settings</div>
+                    
+                    <div class="setting-item" onclick="clearDownloads()">
+                        <div class="setting-left">
+                            <div class="setting-icon pink">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">Clear Download History</span>
+                                <span class="setting-desc">Remove all download records</span>
+                            </div>
+                        </div>
+                        <div class="setting-value">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon blue">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">Privacy Policy</span>
+                                <span class="setting-desc">How we handle your data</span>
+                            </div>
+                        </div>
+                        <div class="setting-value">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon blue">
+                                <i class="fa-solid fa-file-contract"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">Terms of Service</span>
+                                <span class="setting-desc">Usage terms and conditions</span>
+                            </div>
+                        </div>
+                        <div class="setting-value">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon blue">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <div class="setting-info">
+                                <span class="setting-label">App Version</span>
+                                <span class="setting-desc">Current version info</span>
+                            </div>
+                        </div>
+                        <div class="setting-value">
+                            v2.0.0
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABOUT PAGE -->
+            <div class="page" id="aboutPage">
+                <div class="about-header">
+                    <div class="about-logo">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </div>
+                    <div class="about-app-name">Hunter Tech TikTok Downloader</div>
+                    <div class="about-version">Version 1.0</div>
+                </div>
+
+                <div class="about-creator">
+                    <div class="creator-avatar">
+                        <img src="https://i.supaimg.com/ee03b015-e4cf-44d1-a46a-51c00b1084d7/dc1be38b-029a-4e97-89f4-d41b97893b8c.jpg" alt="HUNTER TECH" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'width:80px;height:80px;border-radius:50%;background:var(--gradient-3);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;font-weight:700;margin:0 auto 12px;\'>H</div>';">
+                    </div>
+                    <div class="creator-name">HUNTER TECH</div>
+                    <div class="creator-role">Developer & Founder</div>
+                    
+                    <div class="social-links">
+                        <a href="https://whatsapp.com/channel/0029Vb7a1Zw6rsQsNJXYCn0p" target="_blank" class="social-link">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span class="social-label">WhatsApp</span>
+                            <span class="social-username">Hunter Tech Channel</span>
+                        </a>
+                        
+                        <a href="https://youtube.com/@huntertechteam" target="_blank" class="social-link">
+                            <i class="fa-brands fa-youtube"></i>
+                            <span class="social-label">YouTube</span>
+                            <span class="social-username">@huntertechteam</span>
+                        </a>
+                        
+                        <a href="https://t.me/hunter_tech_team" target="_blank" class="social-link">
+                            <i class="fa-brands fa-telegram"></i>
+                            <span class="social-label">Telegram</span>
+                            <span class="social-username">@huntertechteam</span>
+                        </a>
+                        
+                        <a href="https://tiktok.com/@huntertechteam" target="_blank" class="social-link">
+                            <i class="fa-brands fa-tiktok"></i>
+                            <span class="social-label">TikTok</span>
+                            <span class="social-username">@huntertechteam</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchPage('home')" id="navHome">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('downloads')" id="navDownloads">
+                <i class="fa-solid fa-download"></i>
+                <span>Downloads</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('settings')" id="navSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('about')" id="navAbout">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>About</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastText">Done!</span>
+    </div>
+
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        let currentVideoUrl = '';
+        let isProcessing = false;
+        let currentQuality = 'HD';
+        const qualities = ['HD', 'Full HD', 'SD'];
+        let qualityIndex = 0;
+        let downloadHistory = [];
+
+        // ===== SPLASH SCREEN =====
+        window.addEventListener('load', () => {
+            updateStatusTime();
+            setInterval(updateStatusTime, 30000);
+            
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hide');
+                document.getElementById('appContainer').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('videoUrl').focus();
+                }, 300);
+            }, 2000);
+        });
+
+        function updateStatusTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            document.getElementById('statusTime').textContent = hours + ':' + minutes + ' ' + ampm;
+        }
+
+        // ===== PAGE SWITCHING =====
+        function switchPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageName + 'Page').classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('nav' + pageName.charAt(0).toUpperCase() + pageName.slice(1)).classList.add('active');
+            
+            if (pageName === 'downloads') {
+                renderDownloads();
+            }
+        }
+
+        // ===== INPUT HANDLING =====
+        const urlInput = document.getElementById('videoUrl');
+        const clearBtn = document.getElementById('clearBtn');
+
+        urlInput.addEventListener('input', () => {
+            clearBtn.style.display = urlInput.value ? 'flex' : 'none';
+        });
+
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchVideo();
+        });
+
+        function clearInput() {
+            urlInput.value = '';
+            clearBtn.style.display = 'none';
+            urlInput.focus();
+        }
+
+        // ===== PASTE FROM CLIPBOARD =====
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    urlInput.value = text;
+                    clearBtn.style.display = 'flex';
+                    showToast('Link pasted!', 'success');
+                }
+            } catch {
+                urlInput.focus();
+                showToast('Please paste manually', 'error');
+            }
+        }
+
+        // ===== FETCH VIDEO =====
+        async function fetchVideo() {
+            if (isProcessing) return;
+
+            const videoUrl = urlInput.value.trim();
+            const fetchBtn = document.getElementById('fetchBtn');
+            const fetchBtnText = document.getElementById('fetchBtnText');
+            const loadingSkeleton = document.getElementById('loadingSkeleton');
+            const errorCard = document.getElementById('errorCard');
+            const resultSection = document.getElementById('resultSection');
+            const videoPreview = document.getElementById('videoPreview');
+
+            resultSection.style.display = 'none';
+            errorCard.style.display = 'none';
+            currentVideoUrl = '';
+            videoPreview.src = '';
+
+            if (!videoUrl) {
+                showError('Please enter a TikTok link');
+                urlInput.focus();
+                shakeElement(urlInput);
+                return;
+            }
+
+            if (!videoUrl.includes('tiktok.com') && !videoUrl.includes('vm.tiktok')) {
+                showError('Invalid TikTok URL');
+                shakeElement(urlInput);
+                return;
+            }
+
+            isProcessing = true;
+            fetchBtn.disabled = true;
+            fetchBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching...';
+            loadingSkeleton.style.display = 'block';
+            resultSection.style.display = 'none';
+            errorCard.style.display = 'none';
+
+            try {
+                const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.code === 0 && data.data) {
+                    const videoData = data.data;
+                    let downloadLink;
+                    
+                    if (currentQuality === 'Full HD') {
+                        downloadLink = videoData.hdplay || videoData.play || videoData.wmplay;
+                    } else if (currentQuality === 'HD') {
+                        downloadLink = videoData.play || videoData.hdplay || videoData.wmplay;
+                    } else {
+                        downloadLink = videoData.wmplay || videoData.play || videoData.hdplay;
+                    }
+
+                    if (downloadLink) {
+                        currentVideoUrl = downloadLink;
+                        videoPreview.src = downloadLink;
+                        videoPreview.load();
+                        
+                        loadingSkeleton.style.display = 'none';
+                        resultSection.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            resultSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 200);
+
+                        addToHistory(videoUrl, downloadLink);
+                        showToast('Video ready!', 'success');
+                    } else {
+                        throw new Error('No download link found');
+                    }
+                } else {
+                    throw new Error(data.msg || 'Failed to fetch video');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loadingSkeleton.style.display = 'none';
+                showError(error.message || 'Network error. Try again.');
+            } finally {
+                isProcessing = false;
+                fetchBtn.disabled = false;
+                fetchBtnText.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Fetch Video';
+            }
+        }
+
+        // ===== DOWNLOAD VIDEO (DIRECT - NO NEW PAGE) =====
+        async function downloadVideo() {
+            if (!currentVideoUrl || isProcessing) return;
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            isProcessing = true;
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Downloading...';
+
+            try {
+                // DIRECT BLOB DOWNLOAD - No new page will open
+                const response = await fetch(currentVideoUrl);
+                
+                if (!response.ok) {
+                    throw new Error('Network response failed');
+                }
+
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const anchor = document.createElement('a');
+                anchor.style.display = 'none';
+                anchor.href = blobUrl;
+                anchor.download = 'HUNTER_TECH_TikTok_' + Date.now() + '.mp4';
+                
+                document.body.appendChild(anchor);
+                anchor.click();
+                
+                // Cleanup immediately after click
+                setTimeout(() => {
+                    document.body.removeChild(anchor);
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 150);
+
+                showToast('Download started!', 'success');
+                
+                setTimeout(() => {
+                    downloadBtn.innerHTML = '<i class="fa-solid fa-check"></i> Download Again';
+                    downloadBtn.disabled = false;
+                    isProcessing = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error('Download error:', error);
+                
+                // ONLY if blob download completely fails, fallback
+                showToast('Retrying download...', 'info');
+                
+                try {
+                    const anchor2 = document.createElement('a');
+                    anchor2.href = currentVideoUrl;
+                    anchor2.download = 'HUNTER_TEVH_TikTok_' + Date.now() + '.mp4';
+                    anchor2.target = '_self';
+                    anchor2.style.display = 'none';
+                    document.body.appendChild(anchor2);
+                    anchor2.click();
+                    document.body.removeChild(anchor2);
+                } catch(e) {
+                    console.error('Fallback failed:', e);
+                }
+                
+                downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Try Again';
+                downloadBtn.disabled = false;
+                isProcessing = false;
+            }
+        }
+
+        // ===== DOWNLOAD HISTORY =====
+        function addToHistory(url, downloadUrl) {
+            const item = {
+                id: Date.now(),
+                url: url,
+                downloadUrl: downloadUrl,
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+            downloadHistory.unshift(item);
+            if (downloadHistory.length > 50) downloadHistory.pop();
+            
+            try {
+                localStorage.setItem('huntertech_downloads', JSON.stringify(downloadHistory));
+            } catch(e) {}
+        }
+
+        function renderDownloads() {
+            const emptyState = document.getElementById('emptyDownloads');
+            const downloadsList = document.getElementById('downloadsList');
+            
+            try {
+                const saved = localStorage.getItem('huntertech_downloads');
+                if (saved) downloadHistory = JSON.parse(saved);
+            } catch(e) {}
+
+            if (downloadHistory.length === 0) {
+                emptyState.style.display = 'flex';
+                downloadsList.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                downloadsList.style.display = 'flex';
+                downloadsList.innerHTML = downloadHistory.map((item, index) => `
+                    <div class="download-item">
+                        <div class="download-thumb">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </div>
+                        <div class="download-info">
+                            <div class="download-name">TikTok Video ${index + 1}</div>
+                            <div class="download-date">${item.date} at ${item.time}</div>
+                        </div>
+                        <div class="download-actions">
+                            <button class="download-action-btn btn-play" onclick="reDownload('${item.downloadUrl.replace(/'/g, "\\'")}')" title="Download Again">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                            <button class="download-action-btn btn-delete" onclick="deleteDownload(${item.id})" title="Delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function reDownload(url) {
+            currentVideoUrl = url;
+            downloadVideo();
+        }
+
+        function deleteDownload(id) {
+            downloadHistory = downloadHistory.filter(item => item.id !== id);
+            try {
+                localStorage.setItem('huntertevh_downloads', JSON.stringify(downloadHistory));
+            } catch(e) {}
+            renderDownloads();
+            showToast('Removed from history', 'info');
+        }
+
+        function clearDownloads() {
+            if (confirm('Clear all download history?')) {
+                downloadHistory = [];
+                try {
+                    localStorage.removeItem('huntertech_downloads');
+                } catch(e) {}
+                renderDownloads();
+                showToast('History cleared', 'info');
+            }
+        }
+
+        // ===== SETTINGS =====
+        function cycleQuality() {
+            qualityIndex = (qualityIndex + 1) % qualities.length;
+            currentQuality = qualities[qualityIndex];
+            document.getElementById('qualityValue').innerHTML = currentQuality + ' <i class="fa-solid fa-chevron-right"></i>';
+            showToast('Quality set to ' + currentQuality, 'info');
+        }
+
+        function toggleSetting(type) {
+            const toggle = document.getElementById(type === 'watermark' ? 'watermarkToggle' : 'autoSaveToggle');
+            const status = toggle.checked ? 'ON' : 'OFF';
+            showToast(type === 'watermark' ? 'Watermark removal ' + status : 'Auto-save ' + status, 'info');
+        }
+
+        // ===== HELPERS =====
+        function showError(message) {
+            const errorCard = document.getElementById('errorCard');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorCard.style.display = 'flex';
+            setTimeout(() => { errorCard.style.display = 'none'; }, 4000);
+        }
+
+        function shakeElement(el) {
+            el.style.animation = 'shake 0.5s ease';
+            setTimeout(() => { el.style.animation = ''; }, 500);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            const icon = toast.querySelector('i');
+            
+            toastText.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            
+            if (type === 'success') {
+                icon.className = 'fa-solid fa-circle-check';
+            } else if (type === 'error') {
+                icon.className = 'fa-solid fa-circle-exclamation';
+            } else {
+                icon.className = 'fa-solid fa-circle-info';
+            }
+            
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Initial load
+        renderDownloads();
+    </script>
+</body>
+</html>
